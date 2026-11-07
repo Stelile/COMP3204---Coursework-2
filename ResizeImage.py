@@ -17,11 +17,11 @@ def crop_image(image_path, target_size=(224, 224)):
     img_resized = transform.resize(img_cropped, (*sk_target, 3), anti_aliasing=True, preserve_range=True).astype(img_cropped.dtype)
 
     # code to convert colour into scikit HSV colour-space
-    #if img_resized.dtype == np.uint8:
-    #    img_float = img_resized / 255.0
-    #else:
-    #    img_float = img_resized
+    if img_resized.dtype == np.uint8:
+        img_float = img_resized / 255.0
+    else:
+        img_float = img_resized
         
-    #img_hsv = color.rgb2hsv(img_float)
+    img_hsv = color.rgb2hsv(img_float)
 
-    return img_resized
+    return img_hsv
