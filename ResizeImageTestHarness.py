@@ -5,7 +5,7 @@ import pytest
 from skimage import io, transform, color
 from ResizeImage import crop_image
 
-@pytest.mark.parametrize("taret_size",[(224,224),(128,128)])
+@pytest.mark.parametrize("target_size",[(224,224),(128,128)])
 def test_crop_image_output(plant_village_path, target_size):
     jpg_files = glob.glob(os.path.join(plant_village_path, "**", "*.jpg"), recursive=True)
 
