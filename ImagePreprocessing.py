@@ -95,6 +95,6 @@ def preprocess_image(image_path, target_size=(224,224), sigma=0.8):
     foreground_bgr = remove_leaf_background(img_bgr)
     foreground_rgb = cv2.cvtColor(foreground_bgr, cv2.COLOR_BGR2RGB)
 
-    img_float = foreground_rgb.astype(np.flaot32) / 255.0
+    img_float = foreground_rgb.astype(np.float32) / 255.0
     img_hsv = color.rgb2hsv(img_float)
     return img_hsv

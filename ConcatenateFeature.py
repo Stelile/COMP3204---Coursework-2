@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from skimage import color
 from LocalBinaryPatterns import extract_lbp
 from ComputeHistogramGradients import compute_HOG
 from glcm import glcm_features
@@ -19,6 +20,17 @@ def extract_feature(image: np.ndarray, mask=None) -> np.ndarray:
     _, lbp_histogram = extract_lbp(lbp_input, mask=mask)
     hog_feature = compute_HOG(image)
     glcm_feature = glcm_features(grey, mask=mask)
-    colour_feature = extract_color_features(bgr_input, mask=mask)
-
-    return np.concatenate([lbp_histogram, hog_feature, glcm_feature, colour_feature])
+    colour_result = extract_color_features(bgr_input, mask=mask)
+    colour_feature = np.asarray(colour_result["feature_vector"], dtype=np.float64).ravel()
+    
+    combined = np.concatenate([
+        np.asarray(lbp_histogram, dtype=np.float64).ravel(),
+        np.asarray(hog_feature, dtype=np.float64).ravel(),
+        np.asarray(glcm_feature, dtype=np.float64).ravel(),
+        colour_feature,
+    ])
+    
+    if not np.issubdtype(combined.dtype, np.number):
+        raise TypeError(f"Non-numeric feature vector produced: {[type(x) for x in combined if not isinstance(x, (int, float, np.number))]}")
+    
+    return combined
