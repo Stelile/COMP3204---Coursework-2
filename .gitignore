@@ -219,3 +219,10 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 .DS_Store
+
+# Local PlantVillage data, YOLO runs, and downloaded model weights
+PlantVillage/
+datasets/
+yolo_dataset/
+runs/
+*.pt
