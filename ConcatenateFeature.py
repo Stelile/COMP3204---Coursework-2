@@ -18,7 +18,7 @@ def extract_feature(image: np.ndarray, mask=None) -> np.ndarray:
     _, lbp_histogram = extract_lbp(lbp_input, mask=mask)
     hog_feature = compute_HOG(image)
     glcm_feature = glcm_features(grey, mask=mask)
-    colour_feature = extract_color_features(bgr_input, mask=mask)
+    colour_feature = extract_color_features(bgr_input, mask=mask)["feature_vector"]
 
     combined_feature = np.concatenate([lbp_histogram, hog_feature, glcm_feature, colour_feature])
 
