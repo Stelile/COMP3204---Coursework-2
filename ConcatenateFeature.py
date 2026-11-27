@@ -18,14 +18,14 @@ def extract_feature(image: np.ndarray, mask=None) -> np.ndarray:
         bgr_input = cv2.cvtColor(grey, cv2.COLOR_GRAY2BGR)
 
     _, lbp_histogram = extract_lbp(lbp_input, mask=mask)
-    hog_feature = compute_HOG(image)
+    # hog_feature = compute_HOG(image)
     glcm_feature = glcm_features(grey, mask=mask)
     colour_result = extract_color_features(bgr_input, mask=mask)
     colour_feature = np.asarray(colour_result["feature_vector"], dtype=np.float64).ravel()
-    
+
+    # np.asarray(hog_feature, dtype=np.float64).ravel(),
     combined = np.concatenate([
         np.asarray(lbp_histogram, dtype=np.float64).ravel(),
-        np.asarray(hog_feature, dtype=np.float64).ravel(),
         np.asarray(glcm_feature, dtype=np.float64).ravel(),
         colour_feature,
     ])
