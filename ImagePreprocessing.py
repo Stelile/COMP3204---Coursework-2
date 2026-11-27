@@ -13,7 +13,7 @@ def reduce_noise(image: np.ndarray, sigma: float = 0.8) -> np.ndarray:
     coordinates = np.arange(-2,3)
     x, y = np.meshgrid(coordinates, coordinates)
 
-    kernel = np.exp(-(x**2 + y**2) / (2 / sigma**2))
+    kernel = np.exp(-(x**2 + y**2) / (2 * (sigma**2)))
     kernel /= kernel.sum()
 
     border_padding = [(2,2),(2,2)]
@@ -48,7 +48,7 @@ def remove_leaf_background(image, hue_min=20, hue_max=95, sat_min=30, sat_max=25
 
     kernel = np.ones((kernel_size, kernel_size), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    mask = cv2.morphologyEc(mask, cv2.MORPH_CLOSE, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
     if blur_size > 1:
         mask = cv2.GaussianBlur(mask, (blur_size, blur_size), 0)
@@ -71,13 +71,15 @@ def remove_leaf_background(image, hue_min=20, hue_max=95, sat_min=30, sat_max=25
 
 def preprocess_image(image_path, target_size=(224,224), sigma=0.8):
     img = io.imread(image_path)
+    if img.ndim == 3 and img.shape[2] == 4:
+        img = img[:, :, :3]
     h, w = img.shape[:2]
     min_dim = min(h, w)
 
     start_y = (h - min_dim) // 2
     start_x = (w - min_dim) // 2
 
-    img_cropped = img[start_y + min_dim, start_x: start_x + min_dim]
+    img_cropped = img[start_y: start_y + min_dim, start_x: start_x + min_dim]
 
     sk_target = (target_size[1], target_size[0])
     img_resized = transform.resize(img_cropped, (*sk_target, 3), anti_aliasing=True, preserve_range=True).astype(img_cropped.dtype)
@@ -87,16 +89,12 @@ def preprocess_image(image_path, target_size=(224,224), sigma=0.8):
     if img_denoised.dtype == np.uint8:
         img_bgr = cv2.cvtColor(img_denoised, cv2.COLOR_RGB2BGR)
     else:
-        img_uint8 = (img_denoised * 255).astype(np.uint8)
+        img_uint8 = (img_denoised * 255.0, 0, 255).astype(np.uint8)
         img_bgr = cv2.cvtColor(img_uint8, cv2.COLOR_RGB2BGR)
 
     foreground_bgr = remove_leaf_background(img_bgr)
     foreground_rgb = cv2.cvtColor(foreground_bgr, cv2.COLOR_BGR2RGB)
 
-    if foreground_rgb.dtype == np.uint8:
-        img_float = foreground_rgb.astype(np.float32) / 255.0
-    else:
-        img_float = foreground_rgb
-
+    img_float = foreground_rgb.astype(np.float32) / 255.0
     img_hsv = color.rgb2hsv(img_float)
     return img_hsv
